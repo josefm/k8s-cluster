@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
       w.vm.hostname = "master"
       w.vm.network "private_network", ip: "192.168.33.13"
       w.vm.provider "virtualbox" do |vb|
-        vb.memory = "4096"
+        vb.memory = "12096"
         vb.cpus = 2
         vb.name = "master"
       end
@@ -14,18 +14,22 @@ Vagrant.configure("2") do |config|
       end
       w.vm.network :forwarded_port, guest: 80, host: 9090
       w.vm.network :forwarded_port, guest: 8080, host: 9080
-      w.vm.network :forwarded_port, guest: 8080, host: 9443
-      w.vm.provision "file", source: "~/.ssh", destination: "~/.ssh"
+      w.vm.network :forwarded_port, guest: 443, host: 9443
+      w.vm.network :forwarded_port, guest: 6443, host: 9643
 
+      w.vm.provision "file", source: "~/.ssh", destination: "~/.ssh"
       w.vm.provision "setup-k8s", :type => "shell", :path => "k8s-setup-master.sh"
-      w.vm.provision "setup-hosts", :type => "shell", :path => "setup-helm.sh"
-      w.vm.provision "clone-repositories", :type => "shell", :path => "clone-repositories.sh"
+      w.vm.provision "setup-helm", :type => "shell", :path => "setup-helm.sh"
+      w.vm.provision "setup-gcloud", :type => "shell", :path => "setup-gcloud.sh"
+      w.vm.provision "setup-minikube", :type => "shell", :path => "setup-minikube.sh"
       w.vm.provision "setup-k8s-config", :type => "shell", :path => "setup-k8s-config.sh"
-      w.vm.provision "setup-helm-dashboard-k8s", :type => "shell", :path => "setup-helm-dashboard-k8s.sh"
+      #w.vm.provision "setup-helm-dashboard-k8s", :type => "shell", :path => "setup-helm-dashboard-k8s.sh"
+
+      config.vm.synced_folder ".", "/vagrant"
 
       w.vm.provision "shell", inline: <<-SHELL
         apt-get update
-        apt-get install -y git wget vim curl nano
+        apt-get install -y git wget curl nano
        SHELL
   end
 
@@ -35,7 +39,7 @@ Vagrant.configure("2") do |config|
         w.vm.network "private_network", ip: "192.168.33.14"
 
         w.vm.provider "virtualbox" do |vb|
-          vb.memory = "1024"
+          vb.memory = "2048"
           vb.cpus = 1
           vb.name = "worker-1"
         end
@@ -43,7 +47,7 @@ Vagrant.configure("2") do |config|
        end
      w.vm.provision "shell", inline: <<-SHELL
        apt-get update
-       apt-get install -y git wget vim
+       apt-get install -y git wget nano
      SHELL
   end
 
@@ -53,7 +57,7 @@ Vagrant.configure("2") do |config|
           w.vm.network "private_network", ip: "192.168.33.15"
 
           w.vm.provider "virtualbox" do |vb|
-            vb.memory = "1024"
+            vb.memory = "2048"
             vb.cpus = 1
             vb.name = "worker-2"
           end
@@ -61,7 +65,7 @@ Vagrant.configure("2") do |config|
          end
        w.vm.provision "shell", inline: <<-SHELL
          apt-get update
-         apt-get install -y git wget vim
+         apt-get install -y git wget nano
        SHELL
     end
 end

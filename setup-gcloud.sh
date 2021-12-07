@@ -10,6 +10,6 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyr
 
 sudo apt-get update && sudo apt-get install google-cloud-sdk
 
-gcloud auth application-default login
+#gcloud auth application-default login
 
 exit 0
