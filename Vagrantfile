@@ -18,16 +18,24 @@ Vagrant.configure("2") do |config|
       w.vm.network :forwarded_port, guest: 6443, host: 9643
 
       w.vm.provision "file", source: "~/.ssh", destination: "~/.ssh"
-      w.vm.provision "setup-k8s", :type => "shell", :path => "k8s-setup-master.sh"
+      w.vm.provision "setup-k8s-setup-master", :type => "shell", :path => "k8s-setup-master.sh"
       w.vm.provision "setup-helm", :type => "shell", :path => "setup-helm.sh"
       w.vm.provision "setup-gcloud", :type => "shell", :path => "setup-gcloud.sh"
       w.vm.provision "setup-minikube", :type => "shell", :path => "setup-minikube.sh"
+      w.vm.provision "setup-bash-aliases", :type => "shell", :path => "setup-k8s-config.sh"
       w.vm.provision "setup-k8s-config", :type => "shell", :path => "setup-k8s-config.sh"
       #w.vm.provision "setup-helm-dashboard-k8s", :type => "shell", :path => "setup-helm-dashboard-k8s.sh"
 
       config.vm.synced_folder ".", "/vagrant"
-
+      w.vm.provision "file", source: "bash_aliases", destination: "/tmp/bash_aliases"
       w.vm.provision "shell", inline: <<-SHELL
+        cp /tmp/bash-aliases /home/vagrant/.bash_aliases
+        chown vagrant:vagrant /home/vagrant/.bash_aliases
+        cp /tmp/bash-aliases /root/.bash_aliases
+        sudo cp -f /etc/kubernetes/admin.conf /vagrant/
+      SHELL
+
+      config.vm.provision "shell", inline: <<-SHELL
         apt-get update
         apt-get install -y git wget curl nano
        SHELL
@@ -39,16 +47,12 @@ Vagrant.configure("2") do |config|
         w.vm.network "private_network", ip: "192.168.33.14"
 
         w.vm.provider "virtualbox" do |vb|
-          vb.memory = "2048"
-          vb.cpus = 1
+          vb.memory = "3048"
+          vb.cpus = 2
           vb.name = "worker-1"
         end
-         w.vm.provision "setup-hosts", :type => "shell", :path => "k8s-setup-master.sh" do |s|
+         w.vm.provision "setup-k8s-setup-master-worker-1", :type => "shell", :path => "k8s-setup-master.sh" do |s|
        end
-     w.vm.provision "shell", inline: <<-SHELL
-       apt-get update
-       apt-get install -y git wget nano
-     SHELL
   end
 
   config.vm.box = "ubuntu/impish64"
@@ -57,15 +61,11 @@ Vagrant.configure("2") do |config|
           w.vm.network "private_network", ip: "192.168.33.15"
 
           w.vm.provider "virtualbox" do |vb|
-            vb.memory = "2048"
-            vb.cpus = 1
+            vb.memory = "3048"
+            vb.cpus = 2
             vb.name = "worker-2"
           end
-           w.vm.provision "setup-hosts", :type => "shell", :path => "k8s-setup-master.sh" do |s|
+           w.vm.provision "setup-k8s-setup-master-worker-2", :type => "shell", :path => "k8s-setup-master.sh" do |s|
          end
-       w.vm.provision "shell", inline: <<-SHELL
-         apt-get update
-         apt-get install -y git wget nano
-       SHELL
     end
 end

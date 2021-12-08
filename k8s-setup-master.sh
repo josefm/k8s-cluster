@@ -2,7 +2,10 @@
 
 #set -Eeuo pipefail
 #trap cleanup SIGINT SIGTERM ERR EXIT
-
+# https://programmerclick.com/article/30092093755/
+# https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+echo "vm.max_map_count = 262144" | tee -a /etc/sysctl.conf
+sysctl -p
 
 IFNAME=$1
 ADDRESS="$(ip -4 addr show $IFNAME | grep "inet" | head -1 |awk '{print $2}' | cut -d/ -f1)"

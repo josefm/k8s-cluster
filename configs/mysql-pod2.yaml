@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-test2
+  labels:
+    purpose: demonstrate-envars
+    app: mysql-server2
+spec:
+  containers:
+    - name: mysql-test-container2
+      image: mysql
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: pass2
+        - name: MYSQL_DATABASE
+          value: app
+        - name: MYSQL_USER
+          value: devuser
+        - name: MYSQL_PASSWORD
+          value: devpass
+      ports:
+        - containerPort: 3306
+          name: mysql
