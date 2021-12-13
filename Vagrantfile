@@ -29,9 +29,9 @@ Vagrant.configure("2") do |config|
       config.vm.synced_folder ".", "/vagrant"
       w.vm.provision "file", source: "bash_aliases", destination: "/tmp/bash_aliases"
       w.vm.provision "shell", inline: <<-SHELL
-        cp /tmp/bash-aliases /home/vagrant/.bash_aliases
+        cp /tmp/bash_aliases /home/vagrant/.bash_aliases
         chown vagrant:vagrant /home/vagrant/.bash_aliases
-        cp /tmp/bash-aliases /root/.bash_aliases
+        cp /tmp/bash_aliases /root/.bash_aliases
       SHELL
 
       config.vm.provision "shell", inline: <<-SHELL
